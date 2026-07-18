@@ -1,11 +1,33 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { auth } from "@/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
+
 import Header from "./components/Header";
 import MatchCard from "./components/MatchCard";
 import { matches } from "@/data/matches";
 
 export default function Home() {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <main className="min-h-screen bg-slate-900 text-white">
       <Header />
+
+      {user && (
+        <div className="mt-6 text-center text-green-400 text-lg">
+          Hoş geldin, {user.email}
+        </div>
+      )}
 
       <div className="mx-auto mt-24 max-w-5xl px-6 text-center">
         <h1 className="text-6xl font-bold">⚽ Skorinho</h1>
@@ -31,9 +53,7 @@ export default function Home() {
             50.000 TL
           </h1>
 
-          <p className="mt-5 text-slate-300">
-            ⏳ Son Tahmin Süresi
-          </p>
+          <p className="mt-5 text-slate-300">⏳ Son Tahmin Süresi</p>
 
           <h3 className="mt-2 text-2xl font-bold">
             3 Gün 12 Saat
